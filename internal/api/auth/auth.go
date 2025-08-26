@@ -23,7 +23,7 @@ func GenerateToken(user models.User, tokenType types.TokenType) (string, error) 
 
 	switch tokenType {
 	case types.TokenAccess:
-		expirationTime = time.Minute
+		expirationTime = time.Minute * 15
 	case types.TokenRefresh:
 		expirationTime = time.Hour * 24 * 7
 	default:
@@ -44,7 +44,7 @@ func GenerateToken(user models.User, tokenType types.TokenType) (string, error) 
 	return token.SignedString([]byte(config.GetConfig().SecretKey))
 }
 
-func ValidateToken(tokenString string, tokenType types.TokenType) (*Claims, error) {
+func ValidateToken(tokenString string, tokenType types.TokenType, verifyTokenType bool) (*Claims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("invalid token signing method")
@@ -61,7 +61,7 @@ func ValidateToken(tokenString string, tokenType types.TokenType) (*Claims, erro
 		return nil, errors.New("invalid token")
 	}
 
-	if claims.Subject != string(tokenType) {
+	if claims.Subject != string(tokenType) && verifyTokenType {
 		return nil, errors.New("invalid token type")
 	}
 

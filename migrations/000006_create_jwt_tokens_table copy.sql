@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS jwt_tokens (
+    user_id INTEGER NOT NULL REFERENCES users(id),
+    token_hash TEXT NOT NULL,
+    active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    expires_at TIMESTAMP NOT NULL DEFAULT NOW()
+);

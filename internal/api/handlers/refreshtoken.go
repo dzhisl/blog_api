@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"net/http"
+
 	"example.com/m/internal/api/auth"
 	"example.com/m/internal/api/utils"
 	"example.com/m/internal/storage"
@@ -22,9 +24,21 @@ func RefreshTokenHandler(c *gin.Context) {
 		c.JSON(utils.FormInvalidRequestResponse())
 		return
 	}
-	claims, err := auth.ValidateToken(req.AccessToken, types.TokenRefresh)
+	claims, err := auth.ValidateToken(req.AccessToken, types.TokenRefresh, true)
 	if err != nil {
 		c.JSON(utils.FormErrResponse(400, "invalid refresh token"))
+		return
+	}
+	t, err := storage.GetJwtToken(req.AccessToken)
+	if err != nil {
+		logger.Error(ctx, "failed to get token from db", zap.Error(err))
+		c.JSON(utils.FormInternalErrResponse())
+		return
+	}
+	logger.Debug(ctx, "received token from db", zap.Any("", t))
+	if !t.Active {
+		logger.Warn(ctx, "inactive jwt token", zap.Error(err))
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
 		return
 	}
 	user, err := storage.GetUser(claims.UserID)
@@ -39,6 +53,12 @@ func RefreshTokenHandler(c *gin.Context) {
 		c.JSON(utils.FormInternalErrResponse())
 		return
 	}
+	if err = storage.StoreToken(newAccessToken); err != nil {
+		logger.Error(ctx, "failed to store jwt token in DB", zap.Error(err))
+		c.JSON(utils.FormInternalErrResponse())
+		return
+	}
+
 	c.JSON(200, signUpResponse{
 		AccessToken: newAccessToken,
 	})

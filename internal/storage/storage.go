@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"example.com/m/internal/api/auth"
 	"example.com/m/internal/storage/models"
 	"example.com/m/pkg/logger"
 	"github.com/jmoiron/sqlx"
@@ -116,4 +117,50 @@ func GetUserByUsername(username string) (*models.User, error) {
 	}
 
 	return &user, nil
+}
+
+func StoreToken(tokenString string) error {
+	claims, err := auth.ValidateToken(tokenString, "", false)
+	if err != nil {
+		return fmt.Errorf("failed to validate token: %w", err)
+	}
+
+	hashedToken := auth.HashToken(tokenString)
+
+	token := models.JwtToken{
+		UserID:    claims.UserID,
+		TokenHash: hashedToken,
+		CreatedAt: claims.IssuedAt.Time,
+		ExpiresAt: claims.ExpiresAt.Time,
+	}
+
+	query := `
+		INSERT INTO jwt_tokens (user_id, token_hash, created_at, expires_at)
+		VALUES (:user_id, :token_hash, :created_at, :expires_at)
+	`
+
+	_, err = DB.NamedExec(query, token)
+	if err != nil {
+		return fmt.Errorf("failed to insert token: %w", err)
+	}
+
+	return nil
+}
+
+func GetJwtToken(tokenString string) (*models.JwtToken, error) {
+	hashedToken := auth.HashToken(tokenString)
+
+	var token models.JwtToken
+	query := `
+	 SELECT user_id, token_hash, active, created_at, expires_at
+	 FROM jwt_tokens
+	 WHERE token_hash = $1
+	`
+
+	err := DB.Get(&token, query, hashedToken)
+	if err != nil {
+		return nil, err
+	}
+
+	return &token, nil
 }

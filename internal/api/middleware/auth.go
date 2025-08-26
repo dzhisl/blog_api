@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"example.com/m/internal/api/auth"
+	"example.com/m/internal/api/utils"
+	"example.com/m/internal/storage"
 	"example.com/m/internal/types"
 	"example.com/m/pkg/logger"
 	"github.com/gin-gonic/gin"
@@ -16,7 +18,7 @@ func UserAuthMiddleware(c *gin.Context) {
 	ctx := c.Request.Context()
 	header := c.GetHeader("Authorization")
 	if header == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization token required"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "authorization token required"})
 		c.Abort()
 		return
 	}
@@ -29,7 +31,7 @@ func UserAuthMiddleware(c *gin.Context) {
 	}
 	token := parts[1]
 
-	claims, err := auth.ValidateToken(token, types.TokenAccess)
+	claims, err := auth.ValidateToken(token, types.TokenAccess, true)
 	if err != nil {
 		logger.Warn(ctx, "invalid jwt token", zap.Error(err))
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
@@ -38,7 +40,22 @@ func UserAuthMiddleware(c *gin.Context) {
 	}
 
 	if time.Now().After(claims.ExpiresAt.Time) {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "token is expired"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "token expired"})
+		c.Abort()
+		return
+	}
+
+	t, err := storage.GetJwtToken(token)
+	if err != nil {
+		logger.Error(ctx, "failed to get token from db", zap.Error(err))
+		c.JSON(utils.FormInternalErrResponse())
+		c.Abort()
+		return
+	}
+
+	if !t.Active {
+		logger.Warn(ctx, "inactive jwt token")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "inactive token"})
 		c.Abort()
 		return
 	}
@@ -46,12 +63,10 @@ func UserAuthMiddleware(c *gin.Context) {
 	// Attach claims to context
 	c.Set("claims", claims)
 
-	// Continue to next middleware/handler
 	c.Next()
 }
 
 func AdminAuthMiddleware(c *gin.Context) {
-	// Get claims from context (should be set by UserAuthMiddleware)
 	claims, ok := c.Get("claims")
 	if !ok {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "no claims in context"})
@@ -66,13 +81,11 @@ func AdminAuthMiddleware(c *gin.Context) {
 		return
 	}
 
-	// Check if user has admin role
 	if userClaims.Role != string(types.RoleAdmin) {
-		c.JSON(http.StatusForbidden, gin.H{"error": "not enough rights"})
+		c.JSON(http.StatusForbidden, gin.H{"error": "forbidden: insufficient rights"})
 		c.Abort()
 		return
 	}
 
-	// Continue to next middleware/handler
 	c.Next()
 }

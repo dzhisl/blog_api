@@ -82,9 +82,26 @@ func SignUpHandler(c *gin.Context) {
 	}
 
 	accessToken, err := auth.GenerateToken(*user, types.TokenAccess)
+	if err != nil {
+		logger.Error(ctx, "failed to create jwt token", zap.Error(err))
+		c.JSON(utils.FormInternalErrResponse())
+		return
+	}
+	if err = storage.StoreToken(accessToken); err != nil {
+		logger.Error(ctx, "failed to store jwt token in DB", zap.Error(err))
+		c.JSON(utils.FormInternalErrResponse())
+		return
+	}
+
 	refreshToken, err := auth.GenerateToken(*user, types.TokenRefresh)
 	if err != nil {
 		logger.Error(ctx, "failed to create jwt token", zap.Error(err))
+		c.JSON(utils.FormInternalErrResponse())
+		return
+	}
+
+	if err = storage.StoreToken(refreshToken); err != nil {
+		logger.Error(ctx, "failed to store jwt token in DB", zap.Error(err))
 		c.JSON(utils.FormInternalErrResponse())
 		return
 	}

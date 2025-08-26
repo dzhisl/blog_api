@@ -50,6 +50,14 @@ type Reaction struct {
 	CreatedAt time.Time `db:"created_at"`
 }
 
+type JwtToken struct {
+	UserID    int       `db:"user_id"`
+	TokenHash string    `db:"token_hash"`
+	Active    bool      `db:"active"`
+	CreatedAt time.Time `db:"created_at"`
+	ExpiresAt time.Time `db:"expires_at"`
+}
+
 func NewUserObject(passwordHash, username, firstname string, role types.Role, status types.Status) *User {
 	return &User{
 		PasswordHash: passwordHash,
