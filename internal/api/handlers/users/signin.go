@@ -1,4 +1,4 @@
-package handlers
+package users
 
 import (
 	"example.com/m/internal/api/auth"

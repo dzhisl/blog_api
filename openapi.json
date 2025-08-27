@@ -191,6 +191,45 @@
           }
         }
       }
+    },
+    "/user": {
+      "get": {
+        "summary": "Get info about a user",
+        "tags": ["users"],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID of the user"
+          },
+          {
+            "name": "username",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Username of user"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -331,6 +370,37 @@
           "message": {
             "type": "string",
             "example": "pong"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "required": ["id", "username", "created_at"],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "username": {
+            "type": "string",
+            "example": "johndoe"
+          },
+          "first_name": {
+            "type": "string",
+            "example": "John"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-08-27T12:34:56Z"
+          },
+          "user_role": {
+            "type": "string",
+            "example": "author"
+          },
+          "user_status": {
+            "type": "string",
+            "example": "active"
           }
         }
       }

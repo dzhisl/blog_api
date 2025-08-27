@@ -7,13 +7,13 @@ import (
 )
 
 type User struct {
-	ID           int       `db:"id"`
-	PasswordHash string    `db:"password_hash"`
-	Username     string    `db:"username"`
-	FirstName    *string   `db:"first_name"` // nullable
-	CreatedAt    time.Time `db:"created_at"`
-	UserRole     string    `db:"user_role"`
-	UserStatus   string    `db:"user_status"`
+	ID           int       `db:"id" json:"id"`
+	PasswordHash string    `db:"password_hash" json:"-"`
+	Username     string    `db:"username" json:"username"`
+	FirstName    *string   `db:"first_name" json:"first_name,omitempty"`
+	CreatedAt    time.Time `db:"created_at" json:"created_at"`
+	UserRole     string    `db:"user_role" json:"user_role,omitempty"`
+	UserStatus   string    `db:"user_status" json:"user_status,omitempty"`
 }
 
 type Blog struct {

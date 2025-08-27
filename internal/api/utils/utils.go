@@ -1,8 +1,10 @@
 package utils
 
 import (
+	"errors"
 	"net/http"
 
+	"example.com/m/internal/api/auth"
 	"github.com/gin-gonic/gin"
 )
 
@@ -26,4 +28,17 @@ func FormInvalidRequestResponse() (int, gin.H) {
 
 func FormInternalErrResponse() (int, gin.H) {
 	return FormErrResponse(http.StatusInternalServerError, "internal server error")
+}
+
+func GetClaims(c *gin.Context) (*auth.Claims, error) {
+	claims, ok := c.Get("claims")
+	if !ok {
+		return nil, errors.New("no claims in context")
+	}
+
+	userClaims, ok := claims.(*auth.Claims)
+	if !ok {
+		return nil, errors.New("invalid claims type")
+	}
+	return userClaims, nil
 }

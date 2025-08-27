@@ -2,6 +2,8 @@ package router
 
 import (
 	"example.com/m/internal/api/handlers"
+	"example.com/m/internal/api/handlers/admin"
+	"example.com/m/internal/api/handlers/users"
 	"example.com/m/internal/api/middleware"
 	"github.com/gin-gonic/gin"
 )
@@ -9,7 +11,9 @@ import (
 func InitRouter() *gin.Engine {
 
 	r := gin.New()
+
 	r.Use(middleware.RequestIDMiddleware)
+	r.Use(middleware.CorsMiddleware())
 	RouterGroup := r.Group("/api")
 
 	registerPublicRoutes(*RouterGroup)
@@ -20,13 +24,16 @@ func InitRouter() *gin.Engine {
 
 func registerPublicRoutes(r gin.RouterGroup) {
 	r.GET("ping", handlers.PingHandler)
-	r.POST("sign-up", handlers.SignUpHandler)
-	r.POST("sign-in", handlers.SignInHandler)
-	r.POST("refresh-token", handlers.RefreshTokenHandler)
+
+	r.POST("sign-up", users.SignUpHandler)
+	r.POST("sign-in", users.SignInHandler)
+	r.POST("refresh-token", users.RefreshTokenHandler)
+
 }
 
 func registerUserRoutes(r gin.RouterGroup) {
 	r.Use(middleware.UserAuthMiddleware)
+	r.GET("/user", users.GetUserHandler)
 	r.GET("ping_user", handlers.PingHandler)
 }
 
@@ -35,6 +42,7 @@ func registerAdminRoutes(r gin.RouterGroup) {
 	r.Use(middleware.UserAuthMiddleware, middleware.AdminAuthMiddleware)
 
 	r.GET("admin/ping", handlers.PingHandler)
-	r.POST("admin/token/invalidate", handlers.InvalidateTokenHandler)
-	r.POST("admin/token/invalidate-all", handlers.InvalidateAllTokensHandler)
+
+	r.POST("admin/token/invalidate", admin.InvalidateTokenHandler)
+	r.POST("admin/token/invalidate-all", admin.InvalidateAllTokensHandler)
 }
