@@ -34,10 +34,7 @@ func InvalidateTokenHandler(c *gin.Context) {
 		c.JSON(utils.FormErrResponse(http.StatusBadRequest, err.Error()))
 		return
 	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"message": "token invalidated successfully",
-	})
+	c.JSON(utils.FormResponse("token invalidated successfully"))
 }
 
 // InvalidateAllTokensHandler invalidates all tokens for a user
