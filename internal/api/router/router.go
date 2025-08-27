@@ -33,5 +33,8 @@ func registerUserRoutes(r gin.RouterGroup) {
 func registerAdminRoutes(r gin.RouterGroup) {
 	// Apply UserAuthMiddleware first, then AdminAuthMiddleware
 	r.Use(middleware.UserAuthMiddleware, middleware.AdminAuthMiddleware)
-	r.GET("ping_admin", handlers.PingHandler)
+
+	r.GET("admin/ping", handlers.PingHandler)
+	r.POST("admin/token/invalidate", handlers.InvalidateTokenHandler)
+	r.POST("admin/token/invalidate-all", handlers.InvalidateAllTokensHandler)
 }

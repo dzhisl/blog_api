@@ -164,3 +164,42 @@ func GetJwtToken(tokenString string) (*models.JwtToken, error) {
 
 	return &token, nil
 }
+
+// InvalidateToken marks a specific token as inactive
+func InvalidateToken(tokenString string) error {
+	hashedToken := auth.HashToken(tokenString)
+
+	query := `
+		UPDATE jwt_tokens
+		SET active = FALSE
+		WHERE token_hash = $1
+	`
+
+	result, err := DB.Exec(query, hashedToken)
+	if err != nil {
+		return fmt.Errorf("failed to invalidate token: %w", err)
+	}
+
+	rows, err := result.RowsAffected()
+	if err == nil && rows == 0 {
+		return fmt.Errorf("no token found to invalidate")
+	}
+
+	return nil
+}
+
+// InvalidateAllTokensByUser marks all tokens of a user as inactive
+func InvalidateAllTokensByUser(userID int) error {
+	query := `
+		UPDATE jwt_tokens
+		SET active = FALSE
+		WHERE user_id = $1
+	`
+
+	_, err := DB.Exec(query, userID)
+	if err != nil {
+		return fmt.Errorf("failed to invalidate tokens for user %d: %w", userID, err)
+	}
+
+	return nil
+}
