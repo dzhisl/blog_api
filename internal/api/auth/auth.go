@@ -23,7 +23,7 @@ func GenerateToken(user models.User, tokenType types.TokenType) (string, error) 
 
 	switch tokenType {
 	case types.TokenAccess:
-		expirationTime = time.Minute * 15
+		expirationTime = time.Hour
 	case types.TokenRefresh:
 		expirationTime = time.Hour * 24 * 7
 	default:

@@ -47,4 +47,5 @@ func registerAdminRoutes(r gin.RouterGroup) {
 	r.POST("admin/token/invalidate-all", admin.InvalidateAllTokensHandler)
 	r.POST("admin/user/:user_id/ban", admin.ChangeUserStatushandler(types.StatusBanned))
 	r.POST("admin/user/:user_id/unban", admin.ChangeUserStatushandler(types.StatusOk))
+	r.POST("admin/user/:user_id/change-role", middleware.RoleAuthMiddleware(types.RoleOwner), admin.ChangeUserRoleHandler)
 }

@@ -53,11 +53,11 @@ func GetUserHandler(c *gin.Context) {
 		return
 	}
 
-	// Sanitize sensitive fields
-	if claims.Role == string(types.RoleModerator) || claims.Role == string(types.RoleAdmin) {
+	if types.CompareRoles(types.Role(claims.Role), types.RoleModerator) >= 0 {
 		c.JSON(http.StatusOK, userObj)
 		return
 	}
+
 	c.JSON(http.StatusOK, models.User{
 		ID:        userObj.ID,
 		Username:  userObj.Username,

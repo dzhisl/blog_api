@@ -128,7 +128,21 @@ func ChangeUserStatus(userID int, newStatus types.Status) error {
 	`
 	_, err := DB.Exec(query, userID, newStatus)
 	if err != nil {
-		return fmt.Errorf("failed to invalidate tokens for user %d: %w", userID, err)
+		return err
+	}
+
+	return nil
+}
+
+func ChangeUserRole(userID int, newRole types.Role) error {
+	query := `
+		UPDATE users
+		SET user_role = $2
+		WHERE id = $1
+	`
+	_, err := DB.Exec(query, userID, newRole)
+	if err != nil {
+		return err
 	}
 
 	return nil

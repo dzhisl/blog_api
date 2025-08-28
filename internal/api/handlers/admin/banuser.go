@@ -35,7 +35,7 @@ func ChangeUserStatushandler(status types.Status) func(c *gin.Context) {
 			c.JSON(utils.FormErrResponse(400, "failed to fetch user"))
 			return
 		}
-		if utils.CompareRoles(types.Role(requestAuthor.Role), types.Role(user.UserRole)) == -1 {
+		if types.CompareRoles(types.Role(requestAuthor.Role), types.Role(user.UserRole)) == -1 {
 			c.JSON(utils.FormErrResponse(400, "insufficient rights"))
 			return
 		}

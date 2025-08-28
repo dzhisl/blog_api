@@ -82,7 +82,7 @@ func RoleAuthMiddleware(role types.Role) func(c *gin.Context) {
 			return
 		}
 
-		if utils.CompareRoles(types.Role(userClaims.Role), role) == -1 {
+		if types.CompareRoles(types.Role(userClaims.Role), role) == -1 {
 			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden: insufficient rights"})
 			c.Abort()
 			return
