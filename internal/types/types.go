@@ -7,12 +7,20 @@ type Status string
 type TokenType string
 
 var (
-	RoleUser      Role = "user"
-	RoleAdmin     Role = "admin"
-	RoleModerator Role = "moderator"
+	RoleUser       Role = "user"
+	RoleModerator  Role = "moderator"
+	RoleAdmin      Role = "admin"
+	RoleSuperAdmin Role = "super_admin"
 
 	StatusOk Status = "ok"
 
 	TokenAccess  TokenType = "access"
 	TokenRefresh TokenType = "refresh"
 )
+
+var RolesMap = map[int]Role{
+	0: RoleUser,
+	1: RoleModerator,
+	2: RoleAdmin,
+	3: RoleSuperAdmin,
+}

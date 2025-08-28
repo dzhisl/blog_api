@@ -5,6 +5,7 @@ import (
 	"example.com/m/internal/api/handlers/admin"
 	"example.com/m/internal/api/handlers/users"
 	"example.com/m/internal/api/middleware"
+	"example.com/m/internal/types"
 	"github.com/gin-gonic/gin"
 )
 
@@ -39,7 +40,7 @@ func registerUserRoutes(r gin.RouterGroup) {
 
 func registerAdminRoutes(r gin.RouterGroup) {
 	// Apply UserAuthMiddleware first, then AdminAuthMiddleware
-	r.Use(middleware.UserAuthMiddleware, middleware.AdminAuthMiddleware)
+	r.Use(middleware.UserAuthMiddleware, middleware.RoleAuthMiddleware(types.RoleAdmin))
 
 	r.GET("admin/ping", handlers.PingHandler)
 

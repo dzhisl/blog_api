@@ -66,26 +66,27 @@ func UserAuthMiddleware(c *gin.Context) {
 	c.Next()
 }
 
-func AdminAuthMiddleware(c *gin.Context) {
-	claims, ok := c.Get("claims")
-	if !ok {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "no claims in context"})
-		c.Abort()
-		return
-	}
+func RoleAuthMiddleware(role types.Role) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		claims, ok := c.Get("claims")
+		if !ok {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "no claims in context"})
+			c.Abort()
+			return
+		}
 
-	userClaims, ok := claims.(*auth.Claims)
-	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "invalid claims type"})
-		c.Abort()
-		return
-	}
+		userClaims, ok := claims.(*auth.Claims)
+		if !ok {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "invalid claims type"})
+			c.Abort()
+			return
+		}
 
-	if userClaims.Role != string(types.RoleAdmin) {
-		c.JSON(http.StatusForbidden, gin.H{"error": "forbidden: insufficient rights"})
-		c.Abort()
-		return
+		if utils.CompareRoles(types.Role(userClaims.Role), role) == -1 {
+			c.JSON(http.StatusForbidden, gin.H{"error": "forbidden: insufficient rights"})
+			c.Abort()
+			return
+		}
+		c.Next()
 	}
-
-	c.Next()
 }
