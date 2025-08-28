@@ -28,5 +28,9 @@ func GetAllUsersHandler(c *gin.Context) {
 		c.JSON(utils.FormInternalErrResponse())
 		return
 	}
+	if len(users) == 0 {
+		c.JSON(utils.FormErrResponse(400, "no results"))
+		return
+	}
 	c.JSON(200, users)
 }

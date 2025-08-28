@@ -10,6 +10,8 @@ import (
 	"strings"
 	"time"
 
+	sq "github.com/Masterminds/squirrel"
+
 	"example.com/m/internal/api/auth"
 	"example.com/m/internal/storage/models"
 	"example.com/m/internal/types"
@@ -21,6 +23,7 @@ import (
 )
 
 var DB *sqlx.DB
+var psql = sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
 
 func InitDb(ctx context.Context) {
 	dbUri := fmt.Sprintf("user=%s dbname=%s sslmode=disable password=%s host=%s port=%s", viper.GetString("DP_USERNAME"), viper.GetString("DB_NAME"), viper.GetString("DB_PASS"), viper.GetString("DB_IP"), viper.GetString("DB_PORT"))
@@ -147,6 +150,25 @@ func ChangeUserStatus(userID int, newStatus types.Status) error {
 	}
 
 	return nil
+}
+
+func ChangeUserProfile(userID int, newUsername, newFirstname *string) error {
+	qb := psql.Update("users").Where(sq.Eq{"id": userID})
+
+	if newUsername != nil {
+		qb = qb.Set("username", *newUsername) // must be non-empty (checked in handler)
+	}
+	if newFirstname != nil {
+		qb = qb.Set("first_name", *newFirstname) // can be ""
+	}
+
+	query, args, err := qb.ToSql()
+	if err != nil {
+		return err
+	}
+
+	_, err = DB.Exec(query, args...)
+	return err
 }
 
 func ChangeUserRole(userID int, newRole types.Role) error {
