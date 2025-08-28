@@ -10,7 +10,7 @@ type User struct {
 	ID           int       `db:"id" json:"id"`
 	PasswordHash string    `db:"password_hash" json:"-"`
 	Username     string    `db:"username" json:"username"`
-	FirstName    *string   `db:"first_name" json:"first_name,omitempty"`
+	FirstName    string    `db:"first_name" json:"first_name,omitempty"`
 	CreatedAt    time.Time `db:"created_at" json:"created_at"`
 	UserRole     string    `db:"user_role" json:"user_role,omitempty"`
 	UserStatus   string    `db:"user_status" json:"user_status,omitempty"`
@@ -62,7 +62,7 @@ func NewUserObject(passwordHash, username, firstname string, role types.Role, st
 	return &User{
 		PasswordHash: passwordHash,
 		Username:     username,
-		FirstName:    &firstname,
+		FirstName:    firstname,
 		UserRole:     string(role),
 		UserStatus:   string(status),
 	}

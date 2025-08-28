@@ -120,6 +120,21 @@ func GetUserByUsername(username string) (*models.User, error) {
 	return &user, nil
 }
 
+func GetUsers(offset, limit int) ([]*models.User, error) {
+	var users []*models.User
+	query := `
+		SELECT id, password_hash, username, first_name, created_at, user_role, user_status
+		FROM users
+		OFFSET $1 LIMIT $2`
+
+	err := DB.Select(&users, query, offset, limit)
+	if err != nil {
+		return nil, err
+	}
+
+	return users, nil
+}
+
 func ChangeUserStatus(userID int, newStatus types.Status) error {
 	query := `
 		UPDATE users
