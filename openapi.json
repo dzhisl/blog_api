@@ -108,7 +108,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RefreshTokenRequest"
+                "$ref": "#/components/schemas/TokenRequest"
               }
             }
           }
@@ -139,21 +139,14 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/InvalidateTokenRequest"
+                "$ref": "#/components/schemas/TokenRequest"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Success message",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Success"
-                }
-              }
-            }
+            "$ref": "#/components/responses/SuccessResponse"
           },
           "default": {
             "$ref": "#/components/responses/ErrorResponse"
@@ -177,7 +170,32 @@
         },
         "responses": {
           "200": {
-            "description": "Success message",
+            "$ref": "#/components/responses/SuccessResponse"
+          },
+          "default": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/admin/user/{user_id}/ban": {
+      "post": {
+        "summary": "Ban a user",
+        "tags": ["admin"],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID of the user to ban"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User successfully banned",
             "content": {
               "application/json": {
                 "schema": {
@@ -185,6 +203,79 @@
                 }
               }
             }
+          },
+          "default": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/admin/user/{user_id}/unban": {
+      "post": {
+        "summary": "Unbans a user",
+        "tags": ["admin"],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID of the user to ban"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User successfully banned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/ErrorResponse"
+          }
+        }
+      }
+    },
+    "/admin/user/{user_id}/change-role": {
+      "post": {
+        "summary": "Change role of the user",
+        "tags": ["admin"],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID of the user"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["new_role"],
+                "properties": {
+                  "new_role": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SuccessResponse"
           },
           "default": {
             "$ref": "#/components/responses/ErrorResponse"
@@ -250,6 +341,16 @@
             }
           }
         }
+      },
+      "SuccessResponse": {
+        "description": "Success response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Success"
+            }
+          }
+        }
       }
     },
     "schemas": {
@@ -285,16 +386,7 @@
           }
         }
       },
-      "RefreshTokenRequest": {
-        "type": "object",
-        "required": ["access_token"],
-        "properties": {
-          "access_token": {
-            "type": "string"
-          }
-        }
-      },
-      "InvalidateTokenRequest": {
+      "TokenRequest": {
         "type": "object",
         "required": ["token"],
         "properties": {
@@ -359,7 +451,7 @@
           },
           "message": {
             "type": "string",
-            "example": "Invalid request data",
+            "example": "Success",
             "description": "Response message"
           }
         }

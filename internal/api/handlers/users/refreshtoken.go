@@ -13,7 +13,7 @@ import (
 )
 
 type refreshTokenRequest struct {
-	AccessToken string `json:"access_token"`
+	AccessToken string `json:"token"`
 }
 
 func RefreshTokenHandler(c *gin.Context) {

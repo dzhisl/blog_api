@@ -12,7 +12,8 @@ var (
 	RoleAdmin      Role = "admin"
 	RoleSuperAdmin Role = "super_admin"
 
-	StatusOk Status = "ok"
+	StatusOk     Status = "ok"
+	StatusBanned Status = "banned"
 
 	TokenAccess  TokenType = "access"
 	TokenRefresh TokenType = "refresh"

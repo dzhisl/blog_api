@@ -12,6 +12,7 @@ import (
 
 	"example.com/m/internal/api/auth"
 	"example.com/m/internal/storage/models"
+	"example.com/m/internal/types"
 	"example.com/m/pkg/logger"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -117,6 +118,20 @@ func GetUserByUsername(username string) (*models.User, error) {
 	}
 
 	return &user, nil
+}
+
+func ChangeUserStatus(userID int, newStatus types.Status) error {
+	query := `
+		UPDATE users
+		SET user_status = $2
+		WHERE id = $1
+	`
+	_, err := DB.Exec(query, userID, newStatus)
+	if err != nil {
+		return fmt.Errorf("failed to invalidate tokens for user %d: %w", userID, err)
+	}
+
+	return nil
 }
 
 func StoreToken(tokenString string) error {
