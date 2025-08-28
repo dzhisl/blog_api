@@ -39,7 +39,6 @@ func registerUserRoutes(r gin.RouterGroup) {
 }
 
 func registerAdminRoutes(r gin.RouterGroup) {
-	// Apply UserAuthMiddleware first, then AdminAuthMiddleware
 	r.Use(middleware.UserAuthMiddleware, middleware.RoleAuthMiddleware(types.RoleAdmin))
 
 	r.GET("admin/ping", handlers.PingHandler)

@@ -23,7 +23,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Pong"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "pong"
+                    }
+                  }
                 }
               }
             }
@@ -44,7 +50,23 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SignUpRequest"
+                "type": "object",
+                "required": ["username", "password"],
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "description": "Unique username of the account"
+                  },
+                  "first_name": {
+                    "type": "string",
+                    "description": "Optional first name"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "description": "Password for the account"
+                  }
+                }
               }
             }
           }
@@ -76,7 +98,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SignInRequest"
+                "type": "object",
+                "required": ["username", "password"],
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password"
+                  }
+                }
               }
             }
           }
@@ -108,7 +140,13 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TokenRequest"
+                "type": "object",
+                "required": ["token"],
+                "properties": {
+                  "token": {
+                    "type": "string"
+                  }
+                }
               }
             }
           }
@@ -119,7 +157,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AccessToken"
+                  "type": "object",
+                  "properties": {
+                    "access_token": {
+                      "type": "string",
+                      "description": "Expires in 15 min"
+                    }
+                  }
                 }
               }
             }
@@ -139,7 +183,13 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TokenRequest"
+                "type": "object",
+                "required": ["token"],
+                "properties": {
+                  "token": {
+                    "type": "string"
+                  }
+                }
               }
             }
           }
@@ -163,7 +213,13 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserIdRequest"
+                "type": "object",
+                "required": ["user_id"],
+                "properties": {
+                  "user_id": {
+                    "type": "integer"
+                  }
+                }
               }
             }
           }
@@ -184,25 +240,12 @@
         "tags": ["admin"],
         "parameters": [
           {
-            "name": "user_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            },
-            "description": "ID of the user to ban"
+            "$ref": "#/components/parameters/UserIdPath"
           }
         ],
         "responses": {
           "200": {
-            "description": "User successfully banned",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Success"
-                }
-              }
-            }
+            "$ref": "#/components/responses/SuccessResponse"
           },
           "default": {
             "$ref": "#/components/responses/ErrorResponse"
@@ -216,25 +259,12 @@
         "tags": ["admin"],
         "parameters": [
           {
-            "name": "user_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            },
-            "description": "ID of the user to ban"
+            "$ref": "#/components/parameters/UserIdPath"
           }
         ],
         "responses": {
           "200": {
-            "description": "User successfully banned",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Success"
-                }
-              }
-            }
+            "$ref": "#/components/responses/SuccessResponse"
           },
           "default": {
             "$ref": "#/components/responses/ErrorResponse"
@@ -248,13 +278,7 @@
         "tags": ["admin"],
         "parameters": [
           {
-            "name": "user_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            },
-            "description": "ID of the user"
+            "$ref": "#/components/parameters/UserIdPath"
           }
         ],
         "requestBody": {
@@ -331,13 +355,24 @@
         "bearerFormat": "JWT"
       }
     },
+    "parameters": {
+      "UserIdPath": {
+        "name": "user_id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "integer"
+        },
+        "description": "ID of the user"
+      }
+    },
     "responses": {
       "ErrorResponse": {
         "description": "Error response",
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/components/schemas/Error"
+              "$ref": "#/components/schemas/ErrorResponse"
             }
           }
         }
@@ -347,63 +382,13 @@
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/components/schemas/Success"
+              "$ref": "#/components/schemas/SuccessResponse"
             }
           }
         }
       }
     },
     "schemas": {
-      "SignUpRequest": {
-        "type": "object",
-        "required": ["username", "password"],
-        "properties": {
-          "username": {
-            "type": "string",
-            "description": "Unique username of the account"
-          },
-          "first_name": {
-            "type": "string",
-            "description": "Optional first name"
-          },
-          "password": {
-            "type": "string",
-            "format": "password",
-            "description": "Password for the account"
-          }
-        }
-      },
-      "SignInRequest": {
-        "type": "object",
-        "required": ["username", "password"],
-        "properties": {
-          "username": {
-            "type": "string"
-          },
-          "password": {
-            "type": "string",
-            "format": "password"
-          }
-        }
-      },
-      "TokenRequest": {
-        "type": "object",
-        "required": ["token"],
-        "properties": {
-          "token": {
-            "type": "string"
-          }
-        }
-      },
-      "UserIdRequest": {
-        "type": "object",
-        "required": ["user_id"],
-        "properties": {
-          "user_id": {
-            "type": "integer"
-          }
-        }
-      },
       "TokenPair": {
         "type": "object",
         "properties": {
@@ -417,16 +402,7 @@
           }
         }
       },
-      "AccessToken": {
-        "type": "object",
-        "properties": {
-          "access_token": {
-            "type": "string",
-            "description": "Expires in 15 min"
-          }
-        }
-      },
-      "Error": {
+      "ErrorResponse": {
         "type": "object",
         "properties": {
           "success": {
@@ -441,7 +417,7 @@
           }
         }
       },
-      "Success": {
+      "SuccessResponse": {
         "type": "object",
         "properties": {
           "success": {
@@ -453,15 +429,6 @@
             "type": "string",
             "example": "Success",
             "description": "Response message"
-          }
-        }
-      },
-      "Pong": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string",
-            "example": "pong"
           }
         }
       },
